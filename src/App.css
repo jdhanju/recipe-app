@@ -1,38 +1,45 @@
+
+
 .App {
-  text-align: center;
+  background-color: white;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+form{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  border: 5px solid;
+  margin: auto;
+  width: 50%;
+  height: 40%;
+  padding: 10px;
+  align-items: baseline;
 }
 
-.App-link {
-  color: #61dafb;
+input{
+  padding-bottom:15px;
+  padding-right: 20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+textarea{
+  padding-bottom:50px;
+  padding-right: 100px;
+
 }
+
+.formLabel{
+  padding-bottom: 20px;
+}
+
+.recipeName{
+  border-bottom: 3px solid black;
+}
+
+.recipeName:hover{
+  color: blue;
+}
+
+.list{
+  width: 10%;
+}
+

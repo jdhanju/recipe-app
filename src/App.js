@@ -1,25 +1,57 @@
-import logo from './logo.svg';
+// App.js
+import React, { useState, useEffect } from 'react';
+import RecipeForm from './RecipeForm';
+import RecipeList from './RecipeList';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [recipes, setRecipes] = useState(() => {
+    return JSON.parse(localStorage.getItem('recipes')) || [];
+  });
+  const [newRecipe, setNewRecipe] = useState({
+    name: '',
+    ingredients: '',
+    directions: ''
+  });
+
+  useEffect(() => {
+    const storedRecipes = localStorage.getItem('recipes');
+    if (storedRecipes) {
+      setRecipes(JSON.parse(storedRecipes));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('recipes', JSON.stringify(recipes));
+  }, [recipes]);
+
+  const handleInputChange = (e) => {
+    setNewRecipe({
+      ...newRecipe,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    setRecipes([...recipes, newRecipe]);
+    setNewRecipe({
+      name: '',
+      ingredients: '',
+      directions: ''
+    });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <RecipeForm
+        newRecipe={newRecipe}
+        handleInputChange={handleInputChange}
+        handleFormSubmit={handleFormSubmit}
+      />
+      <RecipeList recipes={recipes} />
     </div>
   );
-}
+};
 
 export default App;
