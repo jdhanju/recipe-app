@@ -32,14 +32,32 @@ const App = () => {
     });
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      //post new product to server
+      const postData = async () => {
+        return await fetch('http://localhost:8080/add-recipe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ...newRecipe })
+        });
+      }
+      console.log(await postData());
+    } catch (error) {
+      console.log(error);
+    }
+
     setRecipes([...recipes, newRecipe]);
     setNewRecipe({
       name: '',
       ingredients: '',
       directions: ''
     });
+
   };
 
   return (
