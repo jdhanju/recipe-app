@@ -6,6 +6,12 @@ import './App.css';
 const App = () => {
   const [recipes, setRecipes] = useState([]);
 
+  const [newRecipe, setNewRecipe] = useState({
+    name: '',
+    ingredients: '',
+    directions: ''
+  });
+
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
@@ -18,13 +24,7 @@ const App = () => {
     };
 
     fetchRecipes();
-  }, [recipes]);
-
-  const [newRecipe, setNewRecipe] = useState({
-    name: '',
-    ingredients: '',
-    directions: ''
-  });
+  }, []);
 
   const handleInputChange = (e) => {
     setNewRecipe({
@@ -48,6 +48,8 @@ const App = () => {
     } catch (error) {
       console.log(error);
     }
+
+    setRecipes([...recipes, newRecipe]);
 
     setNewRecipe({
       name: '',

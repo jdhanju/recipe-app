@@ -17,36 +17,82 @@ app.use(cors())
 
 app.use(bodyParser.json());
 
+
+async function createTables() {
+    // Create the "recipes" table
+    await pool.query(`CREATE TABLE IF NOT EXISTS recipes (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        directions VARCHAR(255),
+        timeLastModified TIMESTAMP DEFAULT NOW()
+    )`);
+
+    // Create the "ingredients" table
+    await pool.query(`CREATE TABLE IF NOT EXISTS ingredients (
+        id SERIAL PRIMARY KEY,
+        recipe_id INT REFERENCES recipes(id),
+        ingredient VARCHAR(255)
+    )`);
+}
+
 app.post('/add-recipe', async function(req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     let name = req.body.name;
     let ingredients = req.body.ingredients;
     let directions = req.body.directions;
 
-    console.log(req.body);
     try {
-        //await pool.query(`CREATE TABLE IF NOT EXISTS recipe (name varchar(255),ingredients varchar(255),directions varchar(255))`);
-        var addRecipeQuery = `INSERT INTO recipe values ($1,$2,$3)`;
-        await pool.query(addRecipeQuery, [name, ingredients, directions]);
-        // const res = await pool.query(`SELECT now()`);
-        // console.log(res.rows);
-        res.send(JSON.stringify(data));
+        //need to create database in docker
+
+        //create the tables
+        await createTables();
+
+        const addRecipeQuery = `
+            INSERT INTO recipes (name, directions) 
+            VALUES ($1, $2) 
+            RETURNING id`;
+
+        const result = await pool.query(addRecipeQuery, [name, directions]);
+        console.log(result.rows);
+        const recipeId = result.rows[0].id;
+
+        // Insert the ingredients into the "ingredients" table
+        const addIngredientsQuery = `
+            INSERT INTO ingredients (recipe_id, ingredient) 
+            VALUES ($1, $2)
+        `;
+
+        const result2 = await pool.query(addIngredientsQuery, [recipeId, ingredients]);
+
+        res.send("Data sent!");
+
     } catch (error) {
         res.send(error);
     }
 })
 
 app.get('/get-recipes', async function(req, res) {
+    //create the tables
+    await createTables();
+
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Content-Type', 'application/json');
-    var allUsersQuery = `SELECT * FROM recipe`
-    pool.query(allUsersQuery, (err, result) => {
-        if (err) {
-            res.end(err)
-        }
+
+    const fetchRecipesQuery = `
+        SELECT r.id, r.name, r.directions, r.timeLastModified, i.ingredient
+        FROM recipes AS r
+        LEFT JOIN ingredients AS i ON r.id = i.recipe_id
+    `;
+
+    try {
+        const result = await pool.query(fetchRecipesQuery);
+        console.log("my data:");
         console.log(result.rows);
         res.json(result.rows);
-    })
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while fetching the recipes.');
+    }
 })
 
 
