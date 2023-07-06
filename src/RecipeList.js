@@ -2,14 +2,7 @@ import { React, useState } from 'react';
 import ReactModal from 'react-modal';
 
 
-function handleRceipeClick(recipe, setModalOpen, setContentModal) {
-  setModalOpen(true);
-  setContentModal(recipe)
-}
 
-function handleCloseModal(setModalOpen) {
-  setModalOpen(false);
-}
 
 function handleDeleteClick(recipeName, recipes, setRecipes) {
 
@@ -36,9 +29,70 @@ function handleDeleteClick(recipeName, recipes, setRecipes) {
   setRecipes(updatedRecipes);
 }
 
-const RecipeList = ({ recipes, setRecipes }) => {
+const RecipeList = ({ recipes, setRecipes, update, setUpdate }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [contentModal, setContentModal] = useState({});
+  const [name, setName] = useState('');
+  const [directions, setDirections] = useState('');
+  const [ingredients, setIngredients] = useState('');
+
+  function handleCloseModal() {
+    setModalOpen(false);
+  }
+
+  function handleRceipeClick(recipe, setModalOpen, setContentModal) {
+    setModalOpen(true);
+    setContentModal(recipe);
+    setName(recipe.name);
+    setIngredients(recipe.ingredient);
+    setDirections(recipe.directions);
+  }
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleDirectionsChange = (e) => {
+    setDirections(e.target.value);
+  };
+
+  const handleIngredientsChange = (e) => {
+    setIngredients(e.target.value);
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    // Perform any necessary logic with the updated name, directions, and ingredients values
+    console.log('Name:', name);
+    console.log('Directions:', directions);
+    console.log('Ingredients:', ingredients);
+
+    try {
+      await fetch(`http://localhost:8080/update-recipe/${encodeURIComponent(name)}/${encodeURIComponent(ingredients)}/${encodeURIComponent(directions)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      //console.log(await response.json());
+    } catch (error) {
+      console.log(error);
+    }
+
+    const updatedRecipes = recipes.map((recipe) => {
+      if (recipe.name === name) {
+        recipe.ingredient = ingredients;
+        recipe.directions = directions;
+        return { ...recipe };
+      }
+      return recipe;
+    });
+
+    setRecipes(updatedRecipes);
+    //setUpdate(!update);
+    handleCloseModal();
+  };
 
 
   return (
@@ -55,23 +109,12 @@ const RecipeList = ({ recipes, setRecipes }) => {
 
       <ReactModal
 
+        onRequestClose={handleCloseModal}
+
         isOpen={
           modalOpen
   /* Boolean describing if the modal should be shown or not. */}
 
-        // onAfterOpen={
-        //   handleAfterOpenFunc
-        // /* Function that will be run after the modal has opened. */}
-
-        // onAfterClose={
-        //   handleAfterCloseFunc
-        // /* Function that will be run after the modal has closed. */}
-
-        // onRequestClose={
-        //   handleRequestCloseFunc
-        // /* Function that will be run when the modal is requested
-        //    to be closed (either by clicking on overlay or pressing ESC).
-        //    Note: It is not called if isOpen is changed by other means. */}
 
         closeTimeoutMS={
           0
@@ -218,14 +261,31 @@ const RecipeList = ({ recipes, setRecipes }) => {
           (props, children) => <div {...props}>{children}</div>
   /* Custom Content element. */}
       >
-        <h2>{contentModal.name}</h2>
-        <h4>Ingredients:</h4>
-        <p>{contentModal.ingredient}</p>
-        <h4>Directions:</h4>
-        <p>{contentModal.directions}</p>
-        <h4>Last Modified:</h4>
-        <p>{contentModal.timelastmodified}</p>
-        <button onClick={() => handleCloseModal(setModalOpen)}>Close Modal</button>
+        <form className="editForm" onSubmit={handleFormSubmit}>
+          <h4>Name:</h4>
+          <input
+            type="text"
+            value={name}
+            onChange={handleNameChange}
+            placeholder="Name"
+          />
+          <h4>Ingredients:</h4>
+          <textarea
+            value={ingredients}
+            onChange={handleIngredientsChange}
+            placeholder="Ingredients"
+          ></textarea>
+          <h4>Directions:</h4>
+          <textarea
+            value={directions}
+            onChange={handleDirectionsChange}
+            placeholder="Directions"
+          ></textarea>
+          <h4>Last Modified:</h4>
+          <p>{contentModal.timelastmodified}</p>
+          <button type="submit">Save</button>
+        </form>
+        <button onClick={handleCloseModal}>Close Modal</button>
       </ReactModal>
     </div>
   );

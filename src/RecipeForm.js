@@ -2,7 +2,7 @@ import React from 'react';
 
 const RecipeForm = ({ newRecipe, handleInputChange, handleFormSubmit }) => {
   return (
-    <form onSubmit={handleFormSubmit}>
+    <form className="mainForm" onSubmit={handleFormSubmit}>
       <label className="formLabel">
         Recipe Name:
         <input

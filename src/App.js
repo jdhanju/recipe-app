@@ -5,6 +5,7 @@ import './App.css';
 
 const App = () => {
   const [recipes, setRecipes] = useState([]);
+  const [update, setUpdate] = useState(true);
 
   const [newRecipe, setNewRecipe] = useState({
     name: '',
@@ -79,7 +80,7 @@ const App = () => {
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
       />
-      <RecipeList recipes={recipes} setRecipes={setRecipes} />
+      <RecipeList recipes={recipes} setRecipes={setRecipes} update={update} setUpdate={setUpdate} />
     </div>
   );
 };

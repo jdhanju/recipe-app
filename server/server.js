@@ -124,6 +124,41 @@ app.delete('/delete-recipe/:recipeName', async function(req, res) {
     }
 });
 
+app.put('/update-recipe/:recipeName/:recipeIngredients/:recipeDirections', async function(req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.setHeader('Content-Type', 'application/json');
+
+    try {
+        const recipeName = req.params.recipeName;
+        const recipeIngredients = req.params.recipeIngredients;
+        const recipeDirections = req.params.recipeDirections;
+
+        // Update the recipe in the "recipes" table
+        const updateRecipeQuery = `
+        UPDATE recipes
+        SET directions = $1, timeLastModified = NOW()
+        WHERE name = $2
+      `;
+
+        // Update the ingredients in the "ingredients" table
+        const updateIngredientsQuery = `
+        UPDATE ingredients
+        SET ingredient = $1
+        WHERE recipe_id = (
+          SELECT id FROM recipes WHERE name = $2
+        )
+      `;
+        await pool.query(updateIngredientsQuery, [recipeIngredients, recipeName]);
+        await pool.query(updateRecipeQuery, [recipeDirections, recipeName]);
+
+        res.send("Recipe updated successfully!");
+    } catch (error) {
+        res.status(500).send('An error occurred while updating the recipe.');
+    }
+});
+
+
+
 
 
 app.listen(8080, function() {
