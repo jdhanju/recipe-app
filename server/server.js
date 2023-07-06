@@ -95,6 +95,36 @@ app.get('/get-recipes', async function(req, res) {
     }
 })
 
+app.delete('/delete-recipe/:recipeName', async function(req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.setHeader('Content-Type', 'application/json');
+
+    try {
+        const recipeName = req.params.recipeName;
+
+        // Delete the recipe from the "recipes" table
+        const deleteRecipeQuery = `
+            DELETE FROM recipes
+            WHERE name = $1
+        `;
+
+        // Delete the associated ingredients from the "ingredients" table
+        const deleteIngredientsQuery = `
+            DELETE FROM ingredients
+            WHERE recipe_id IN (
+                SELECT id FROM recipes WHERE name = $1
+            )
+        `;
+
+        await pool.query(deleteIngredientsQuery, [recipeName]); //we need to delete the ingredient first since it is dependant on recipe
+        await pool.query(deleteRecipeQuery, [recipeName]);
+        res.send("Recipe deleted successfully!");
+    } catch (error) {
+        res.status(500).send('An error occurred while deleting the recipe.');
+    }
+});
+
+
 
 app.listen(8080, function() {
     console.log(`app is running on port 8080`);

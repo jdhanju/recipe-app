@@ -65,7 +65,7 @@ const App = () => {
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
       />
-      <RecipeList recipes={recipes} />
+      <RecipeList recipes={recipes} setRecipes={setRecipes} />
     </div>
   );
 };

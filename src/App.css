@@ -31,9 +31,9 @@ textarea{
   padding-bottom: 20px;
 }
 
-.recipeName{
+/* .recipeName{
   border-bottom: 3px solid black;
-}
+} */
 
 .recipeName:hover{
   color: blue;
@@ -41,5 +41,17 @@ textarea{
 
 .list{
   width: 10%;
+}
+
+.recipe-row{
+  border-bottom: 3px solid black;
+  display: inline-flex;
+  column-gap: 40px;
+}
+
+.deleteButton{
+  height: 75%;
+  text-align: center;
+  margin: auto;
 }
 

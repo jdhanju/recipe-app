@@ -11,7 +11,32 @@ function handleCloseModal(setModalOpen) {
   setModalOpen(false);
 }
 
-const RecipeList = ({ recipes }) => {
+function handleDeleteClick(recipeName, recipes, setRecipes) {
+
+  //delete from server
+  fetch(`http://localhost:8080/delete-recipe/${encodeURIComponent(recipeName)}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Recipe deleted successfully!');
+      } else {
+        throw new Error('Failed to delete recipe.');
+      }
+    })
+    .catch(error => {
+      console.error(error);
+    });
+
+  //trigger render
+  const updatedRecipes = recipes.filter(recipe => recipe.name !== recipeName);
+  setRecipes(updatedRecipes);
+}
+
+const RecipeList = ({ recipes, setRecipes }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [contentModal, setContentModal] = useState({});
 
@@ -21,8 +46,9 @@ const RecipeList = ({ recipes }) => {
       <h2>Recipe List</h2>
       <p>(click on name)</p>
       {recipes.map((recipe, index) => (
-        <div key={index}>
+        <div className='recipe-row' key={index}>
           <h3 className="recipeName" onClick={() => handleRceipeClick(recipe, setModalOpen, setContentModal)}>{recipe.name}</h3>
+          <button className='deleteButton' onClick={() => { handleDeleteClick(recipe.name, recipes, setRecipes) }}>Delete</button>
         </div>
       ))}
 
