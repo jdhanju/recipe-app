@@ -9,7 +9,8 @@ const App = () => {
   const [newRecipe, setNewRecipe] = useState({
     name: '',
     ingredients: '',
-    directions: ''
+    directions: '',
+    timelastmodified: ''
   });
 
   useEffect(() => {
@@ -49,12 +50,25 @@ const App = () => {
       console.log(error);
     }
 
-    setRecipes([...recipes, newRecipe]);
+    //setRecipes([...recipes, newRecipe]);
+    //change this later?
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/get-recipes');
+        const data = await response.json();
+        setRecipes(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchRecipes();
 
     setNewRecipe({
       name: '',
       ingredients: '',
-      directions: ''
+      directions: '',
+      timelastmodified: ''
     });
   };
 
