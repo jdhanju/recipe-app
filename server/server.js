@@ -124,11 +124,12 @@ app.delete('/delete-recipe/:recipeID', async function(req, res) {
     }
 });
 
-app.put('/update-recipe/:recipeName/:recipeIngredients/:recipeDirections', async function(req, res) {
+app.put('/update-recipe/:id/:recipeName/:recipeIngredients/:recipeDirections', async function(req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Content-Type', 'application/json');
 
     try {
+        const id = req.params.id;
         const recipeName = req.params.recipeName;
         const recipeIngredients = req.params.recipeIngredients;
         const recipeDirections = req.params.recipeDirections;
@@ -136,20 +137,18 @@ app.put('/update-recipe/:recipeName/:recipeIngredients/:recipeDirections', async
         // Update the recipe in the "recipes" table
         const updateRecipeQuery = `
         UPDATE recipes
-        SET directions = $1, timeLastModified = NOW()
-        WHERE name = $2
+        SET name = $1, directions = $2, timeLastModified = NOW()
+        WHERE id = $3
       `;
+        await pool.query(updateRecipeQuery, [recipeName, recipeDirections, id]);
 
         // Update the ingredients in the "ingredients" table
         const updateIngredientsQuery = `
         UPDATE ingredients
         SET ingredient = $1
-        WHERE recipe_id = (
-          SELECT id FROM recipes WHERE name = $2
-        )
+        WHERE recipe_id = $2
       `;
-        await pool.query(updateIngredientsQuery, [recipeIngredients, recipeName]);
-        await pool.query(updateRecipeQuery, [recipeDirections, recipeName]);
+        await pool.query(updateIngredientsQuery, [recipeIngredients, id]);
 
         res.send("Recipe updated successfully!");
     } catch (error) {

@@ -29,12 +29,14 @@ function handleDeleteClick(recipeID, recipes, setRecipes) {
   setRecipes(updatedRecipes);
 }
 
-const RecipeList = ({ recipes, setRecipes, update, setUpdate }) => {
+const RecipeList = ({ recipes, setRecipes }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [contentModal, setContentModal] = useState({});
   const [name, setName] = useState('');
   const [directions, setDirections] = useState('');
   const [ingredients, setIngredients] = useState('');
+  const [id, setID] = useState('');
+  const [time, setTime] = useState('');
 
   function handleCloseModal() {
     setModalOpen(false);
@@ -46,6 +48,8 @@ const RecipeList = ({ recipes, setRecipes, update, setUpdate }) => {
     setName(recipe.name);
     setIngredients(recipe.ingredient);
     setDirections(recipe.directions);
+    setID(recipe.id);
+    setTime(recipe.timelastmodified);
   }
 
   const handleNameChange = (e) => {
@@ -69,7 +73,7 @@ const RecipeList = ({ recipes, setRecipes, update, setUpdate }) => {
     console.log('Ingredients:', ingredients);
 
     try {
-      await fetch(`http://localhost:8080/update-recipe/${encodeURIComponent(name)}/${encodeURIComponent(ingredients)}/${encodeURIComponent(directions)}`, {
+      await fetch(`http://localhost:8080/update-recipe/${encodeURIComponent(contentModal.id)}/${encodeURIComponent(name)}/${encodeURIComponent(ingredients)}/${encodeURIComponent(directions)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -80,17 +84,30 @@ const RecipeList = ({ recipes, setRecipes, update, setUpdate }) => {
       console.log(error);
     }
 
-    const updatedRecipes = recipes.map((recipe) => {
-      if (recipe.name === name) {
-        recipe.ingredient = ingredients;
-        recipe.directions = directions;
-        return { ...recipe };
-      }
-      return recipe;
-    });
+    // const updatedRecipes = recipes.map((recipe) => {
+    //   if (recipe.id === id) {
+    //     recipe.name = name;
+    //     recipe.ingredient = ingredients;
+    //     recipe.directions = directions;
+    //     recipe.timelastmodified = time;
+    //     return { ...recipe };
+    //   }
+    //   return recipe;
+    // });
 
-    setRecipes(updatedRecipes);
-    //setUpdate(!update);
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/get-recipes');
+        const data = await response.json();
+        setRecipes(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchRecipes();
+
+    //setRecipes(updatedRecipes);
     handleCloseModal();
   };
 
