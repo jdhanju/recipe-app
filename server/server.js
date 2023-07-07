@@ -95,24 +95,24 @@ app.get('/get-recipes', async function(req, res) {
     }
 })
 
-app.delete('/delete-recipe/:recipeName', async function(req, res) {
+app.delete('/delete-recipe/:recipeID', async function(req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Content-Type', 'application/json');
 
     try {
-        const recipeName = req.params.recipeName;
+        const recipeName = req.params.recipeID;
 
         // Delete the recipe from the "recipes" table
         const deleteRecipeQuery = `
             DELETE FROM recipes
-            WHERE name = $1
+            WHERE id = $1
         `;
 
         // Delete the associated ingredients from the "ingredients" table
         const deleteIngredientsQuery = `
             DELETE FROM ingredients
             WHERE recipe_id IN (
-                SELECT id FROM recipes WHERE name = $1
+                SELECT id FROM recipes WHERE id = $1
             )
         `;
 

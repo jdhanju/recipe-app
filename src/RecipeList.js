@@ -4,10 +4,10 @@ import ReactModal from 'react-modal';
 
 
 
-function handleDeleteClick(recipeName, recipes, setRecipes) {
+function handleDeleteClick(recipeID, recipes, setRecipes) {
 
   //delete from server
-  fetch(`http://localhost:8080/delete-recipe/${encodeURIComponent(recipeName)}`, {
+  fetch(`http://localhost:8080/delete-recipe/${encodeURIComponent(recipeID)}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
@@ -25,7 +25,7 @@ function handleDeleteClick(recipeName, recipes, setRecipes) {
     });
 
   //trigger render
-  const updatedRecipes = recipes.filter(recipe => recipe.name !== recipeName);
+  const updatedRecipes = recipes.filter(recipe => recipe.id !== recipeID);
   setRecipes(updatedRecipes);
 }
 
@@ -102,7 +102,7 @@ const RecipeList = ({ recipes, setRecipes, update, setUpdate }) => {
       {recipes.map((recipe, index) => (
         <div className='recipe-row' key={index}>
           <h3 className="recipeName" onClick={() => handleRceipeClick(recipe, setModalOpen, setContentModal)}>{recipe.name}</h3>
-          <button className='deleteButton' onClick={() => { handleDeleteClick(recipe.name, recipes, setRecipes) }}>Delete</button>
+          <button className='deleteButton' onClick={() => { handleDeleteClick(recipe.id, recipes, setRecipes) }}>Delete</button>
         </div>
       ))}
 
