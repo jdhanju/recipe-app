@@ -1,16 +1,24 @@
 const express = require('express');
-const serveIndex = require('serve-index');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg')
 
-const pool = new Pool({
+const PORT = 8080;
+
+pool = new Pool({
     user: 'postgres',
-    host: 'localhost',
-    database: 'recipes',
-    password: 'password'
+    host: 'db',
+    password: 'root'
 })
+
+pool.connect((err, client, release) => {
+    if (err) {
+        return console.error('Error acquiring client', err.stack)
+    } else {
+        console.log("working");
+    }
+});
 
 //enabling cors policy
 app.use(cors())
@@ -34,6 +42,10 @@ async function createTables() {
         ingredient VARCHAR(255)
     )`);
 }
+
+app.get('/', function(req, res) {
+    res.send(res.status);
+})
 
 app.post('/add-recipe', async function(req, res) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -160,6 +172,5 @@ app.put('/update-recipe/:id/:recipeName/:recipeIngredients/:recipeDirections', a
 
 
 
-app.listen(8080, function() {
-    console.log(`app is running on port 8080`);
-})
+app.listen(PORT, '0.0.0.0')
+console.log(`Running on port ${PORT}`)
