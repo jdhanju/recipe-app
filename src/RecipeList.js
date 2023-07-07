@@ -35,8 +35,6 @@ const RecipeList = ({ recipes, setRecipes }) => {
   const [name, setName] = useState('');
   const [directions, setDirections] = useState('');
   const [ingredients, setIngredients] = useState('');
-  const [id, setID] = useState('');
-  const [time, setTime] = useState('');
 
   function handleCloseModal() {
     setModalOpen(false);
@@ -48,8 +46,6 @@ const RecipeList = ({ recipes, setRecipes }) => {
     setName(recipe.name);
     setIngredients(recipe.ingredient);
     setDirections(recipe.directions);
-    setID(recipe.id);
-    setTime(recipe.timelastmodified);
   }
 
   const handleNameChange = (e) => {
